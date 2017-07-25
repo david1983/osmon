@@ -90,7 +90,7 @@ function getDriveSpace(callback){
 setInterval(()=>{
    getStats((data)=>{
       var d = new Date();
-      var logPath = "./logs/system-" + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDay()
+      var logPath = "./logs/system-" + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDay() + ".log";
       try{
          var log = fs.readFileSync(logPath,'utf-8')
          var logs = JSON.parse(log);
@@ -100,7 +100,6 @@ setInterval(()=>{
 
       logs.push(data)
       fs.writeFileSync(logPath, JSON.stringify(logs), 'utf-8')
-
       
    })
 },1000)
