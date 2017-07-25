@@ -3,6 +3,12 @@ var _ = require('lodash');
 var exec = require('child_process').exec;
 var fs=require('fs');
 
+try{
+   fs.statSync('./logs')
+}catch(e){
+   fs.mkdirSync("logs")
+}
+
 
 /*
  *Just for being fair with my packages and to do list all network IFaces i prefer doing the later method and execlude the os.networkInterfaces() package
