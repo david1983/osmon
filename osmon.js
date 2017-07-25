@@ -2,6 +2,7 @@ var os = require('os');
 var _ = require('lodash');
 var exec = require('child_process').exec;
 var fs=require('fs');
+var firebase = require("firebase");
 
 try{
    fs.statSync('./logs')
@@ -9,6 +10,16 @@ try{
    fs.mkdirSync("logs")
 }
 
+
+var config = {
+    apiKey: "AIzaSyCTPCc-dc8PVyz2zF-G8xA1BhHLOpakX0o",
+    authDomain: "metrics-62e24.firebaseapp.com",
+    databaseURL: "https://metrics-62e24.firebaseio.com",
+    projectId: "metrics-62e24",
+    storageBucket: "",
+    messagingSenderId: "1072892963262"
+  };
+  firebase.initializeApp(config);
 
 /*
  *Just for being fair with my packages and to do list all network IFaces i prefer doing the later method and execlude the os.networkInterfaces() package
@@ -98,6 +109,9 @@ setInterval(()=>{
          var logs=[]
       }
 
+      var fireLogList = firebase.database().ref(data.hostname);
+      var newLog = fireLogList.push();
+      newLog.set(data);
       logs.push(data)
       fs.writeFileSync(logPath, JSON.stringify(logs), 'utf-8')
       
