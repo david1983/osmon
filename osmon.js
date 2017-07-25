@@ -67,7 +67,6 @@ function getStats(next) {
 
 }
 
-
 function getDriveSpace(callback){
     exec("df -k /", function(error, stdout, stderr)
     {
@@ -100,20 +99,20 @@ function getDriveSpace(callback){
 
 setInterval(()=>{
    getStats((data)=>{
-      var d = new Date();
-      var logPath = "./logs/system-" + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDay() + ".log";
-      try{
-         var log = fs.readFileSync(logPath,'utf-8')
-         var logs = JSON.parse(log);
-      }catch(e){
-         var logs=[]
-      }
+    //   var d = new Date();
+    //   var logPath = "./logs/system-" + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDay() + ".log";
+    //   try{
+    //      var log = fs.readFileSync(logPath,'utf-8')
+    //      var logs = JSON.parse(log);
+    //   }catch(e){
+    //      var logs=[]
+    //   }
 
       var fireLogList = firebase.database().ref(data.hostname);
       var newLog = fireLogList.push();
       newLog.set(data);
-      logs.push(data)
-      fs.writeFileSync(logPath, JSON.stringify(logs), 'utf-8')
+    //   logs.push(data)
+    //   fs.writeFileSync(logPath, JSON.stringify(logs), 'utf-8')
       
    })
 },1000)
