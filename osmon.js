@@ -47,7 +47,12 @@ function getStats(next) {
                 };
             });
             getDriveSpace(function(error,total,free,status){
+
+            var dt = new Date();
+            var utcDate = dt.toUTCString();
                 var obj = {
+                    date: utcDate,
+                    timestamp: Math.floor(Date.now()),
                     hostname: os.hostname(),
                     cpus : os.cpus(),
                     freemem : os.freemem(),
