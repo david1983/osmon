@@ -100,8 +100,8 @@ function getDriveSpace(callback) {
 
 var metrics = new Datastore({ filename: 'metrics.db', autoload: true });
 let buffer = []
-const bufferLimit = 10
-const interval = 1000
+const bufferLimit = 4
+const interval = 500
 setInterval(() => {
 
     getStats((data) => {
