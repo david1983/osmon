@@ -98,15 +98,17 @@ function getDriveSpace(callback) {
     });
 }
 
-var metrics = new Datastore({ filename: 'metrics.db', autoload: true });
+
+
 let buffer = []
 const bufferLimit = 4
 const interval = 500
 setInterval(() => {
-
+    let d = new Date();
     getStats((data) => {
         buffer.push(data)        
         if(buffer.length>=bufferLimit){
+            let metrics = new Datastore({ filename: 'logs/metrics-'  + d.getFullYear() + '-' + d.getMonth() + '-' + d.getDay() + '.db', autoload: true });
             metrics.insert(buffer, (e,r)=>{
                 buffer = []
             })
