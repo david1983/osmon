@@ -6,6 +6,7 @@
   "dependencies": {
     "firebase": "^4.1.5",
     "lodash": "^4.17.4",
+    "nedb": "^1.8.0",
     "os-monitor": "^1.0.5"
   }
 }

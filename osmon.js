@@ -1,13 +1,14 @@
 var os = require('os');
 var _ = require('lodash');
 var exec = require('child_process').exec;
-var fs=require('fs');
+var fs = require('fs');
 var firebase = require("firebase");
+var Datastore = require('nedb');
 
-try{
-   fs.statSync('./logs')
-}catch(e){
-   fs.mkdirSync("logs")
+try {
+    fs.statSync('./logs')
+} catch (e) {
+    fs.mkdirSync("logs")
 }
 
 
@@ -18,8 +19,8 @@ var config = {
     projectId: "metrics-62e24",
     storageBucket: "",
     messagingSenderId: "1072892963262"
-  };
-  firebase.initializeApp(config);
+};
+firebase.initializeApp(config);
 
 /*
  *Just for being fair with my packages and to do list all network IFaces i prefer doing the later method and execlude the os.networkInterfaces() package
@@ -32,31 +33,31 @@ var config = {
 
 //TODO: TESTS
 function getStats(next) {
-    fs.readdir('/sys/class/net',function(err,IFaces){
-        if(err) {
+    fs.readdir('/sys/class/net', function (err, IFaces) {
+        if (err) {
             process.exit(1);
-        }else{
+        } else {
             // IFaces holds an array list of all network Interfaces in the system
-            var networks = _.map(IFaces,function(IFace){
-                var Tx_Bytes=fs.readFileSync('/sys/class/net/'+IFace+'/statistics/tx_bytes');
-                var Rx_Bytes=fs.readFileSync('/sys/class/net/'+IFace+'/statistics/rx_bytes');
+            var networks = _.map(IFaces, function (IFace) {
+                var Tx_Bytes = fs.readFileSync('/sys/class/net/' + IFace + '/statistics/tx_bytes');
+                var Rx_Bytes = fs.readFileSync('/sys/class/net/' + IFace + '/statistics/rx_bytes');
                 return {
                     name: IFace,
                     tx: parseInt(Tx_Bytes),
                     rx: parseInt(Rx_Bytes)
                 };
             });
-            getDriveSpace(function(error,total,free,status){
+            getDriveSpace(function (error, total, free, status) {
 
-            var dt = new Date();
-            var utcDate = dt.toUTCString();
+                var dt = new Date();
+                var utcDate = dt.toUTCString();
                 var obj = {
                     date: utcDate,
                     timestamp: Math.floor(Date.now()),
                     hostname: os.hostname(),
-                    cpus : os.cpus(),
-                    freemem : os.freemem(),
-                    totalmem : os.totalmem(),
+                    cpus: os.cpus(),
+                    freemem: os.freemem(),
+                    totalmem: os.totalmem(),
                     uptime: os.uptime(),
                     loadavg: os.loadavg(),
                     diskfree: free,
@@ -72,52 +73,43 @@ function getStats(next) {
 
 }
 
-function getDriveSpace(callback){
-    exec("df -k /", function(error, stdout, stderr)
-    {
-        if (error)
-        {
-            if (stderr.indexOf("No such file or directory") != -1)
-            {
+function getDriveSpace(callback) {
+    exec("df -k /", function (error, stdout, stderr) {
+        if (error) {
+            if (stderr.indexOf("No such file or directory") != -1) {
                 status = 'NOTFOUND';
             }
-            else
-            {
+            else {
                 status = 'STDERR';
             }
 
             callback(error, total, free, status);
         }
-        else
-        {
+        else {
             var lines = stdout.trim().split("\n");
 
-            var str_disk_info = lines[lines.length - 1].replace( /[\s\n\r]+/g,' ');
-            var disk_info = str_disk_info.split(' ');            
+            var str_disk_info = lines[lines.length - 1].replace(/[\s\n\r]+/g, ' ');
+            var disk_info = str_disk_info.split(' ');
             total = disk_info[1] * 1024;
             free = disk_info[3] * 1024;
             status = 'READY';
-            callback(null, total, free, status);        }
+            callback(null, total, free, status);
+        }
     });
 }
 
+var metrics = new Datastore({ filename: 'metrics.db', autoload: true });
+let buffer = []
+const bufferLimit = 10
+const interval = 1000
+setInterval(() => {
 
-setInterval(()=>{
-   getStats((data)=>{
-    //   var d = new Date();
-    //   var logPath = "./logs/system-" + d.getFullYear() + "-" + d.getMonth() + "-" + d.getDay() + ".log";
-    //   try{
-    //      var log = fs.readFileSync(logPath,'utf-8')
-    //      var logs = JSON.parse(log);
-    //   }catch(e){
-    //      var logs=[]
-    //   }
-
-      var fireLogList = firebase.database().ref(data.hostname);
-      var newLog = fireLogList.push();
-      newLog.set(data);
-    //   logs.push(data)
-    //   fs.writeFileSync(logPath, JSON.stringify(logs), 'utf-8')
-      
-   })
-},1000)
+    getStats((data) => {
+        buffer.push(data)        
+        if(buffer.length>=bufferLimit){
+            metrics.insert(buffer, (e,r)=>{
+                buffer = []
+            })
+        }       
+    })
+}, 1000)
