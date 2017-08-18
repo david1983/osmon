@@ -105,7 +105,7 @@ const bufferLimit = 4
 const interval = 500
 setInterval(() => {
     let d = new Date();
-    let confObj = { filename: 'logs/metrics-'  + d.getFullYear() + '-' + parseInt(d.getMonth())+1 + '-' + d.getDate() + '.db', autoload: true }
+    let confObj = { filename: 'logs/metrics-'  + d.getFullYear() + '-' + (parseInt(d.getMonth())+1) + '-' + d.getDate() + '.db', autoload: true }
     
     try{
         fs.statSync(confObj.filename)
