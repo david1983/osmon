@@ -105,10 +105,17 @@ const bufferLimit = 4
 const interval = 500
 setInterval(() => {
     let d = new Date();
+    let confObj = { filename: 'logs/metrics-'  + d.getFullYear() + '-' + d.getMonth() + '-' + d.getDay() + '.db', autoload: true }
+    try{
+        fs.statSync(confObj.filename)
+    }catch(e){
+        fs.writeFileSync(confObj.filename, '')
+    }
+    
     getStats((data) => {
         buffer.push(data)        
         if(buffer.length>=bufferLimit){
-            let metrics = new Datastore({ filename: 'logs/metrics-'  + d.getFullYear() + '-' + d.getMonth() + '-' + d.getDay() + '.db', autoload: true });
+            let metrics = new Datastore(confObj);
             metrics.insert(buffer, (e,r)=>{
                 buffer = []
             })
