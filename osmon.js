@@ -101,8 +101,8 @@ function getDriveSpace(callback) {
 
 
 let buffer = []
-const bufferLimit = 4
-const interval = 500
+const bufferLimit = 10
+const interval = 1000
 setInterval(() => {
     let d = new Date();
     let confObj = { filename: 'logs/metrics-'  + d.getFullYear() + '-' + (parseInt(d.getMonth())+1) + '-' + d.getDate() + '.db', autoload: true }
@@ -123,4 +123,4 @@ setInterval(() => {
             })
         }       
     })
-}, 1000)
+}, interval)
