@@ -4,8 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "firebase": "^4.1.5",
-    "lodash": "^4.17.4",
+    "firebase": "^4.5.1",
+    "lodash": "^4.17.5",
     "nedb": "^1.8.0",
     "os-monitor": "^1.0.5"
   }
